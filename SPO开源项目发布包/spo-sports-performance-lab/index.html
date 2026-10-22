@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="SPO 科技体能训练中心：AI运动表现、AI体态与动作筛查、神经反应训练开源演示基线。">
+  <title>SPO 科技体能训练开源实验室</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark">SPO</span>
+      <span><strong>科技体能训练开源实验室</strong><small>SPORTS PERFORMANCE OPEN LAB</small></span>
+    </div>
+    <div class="status-pill"><i></i> 浏览器端本地计算</div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div>
+        <p class="eyebrow">OPEN DEMONSTRATION BASELINE · V0.1</p>
+        <h1>让运动表现可测量，<br><em>让训练反馈可解释。</em></h1>
+        <p class="hero-copy">单摄像头人体关键点识别 + 自主指标逻辑 + 神经反应任务。用于技术验证、教学演示与业务原型，不替代专业测力台或医学诊断。</p>
+      </div>
+      <div class="hero-metrics">
+        <article><b>17</b><span>人体关键点</span></article>
+        <article><b>3</b><span>业务模块</span></article>
+        <article><b>LOCAL</b><span>视频不上传</span></article>
+      </div>
+    </section>
+
+    <nav class="module-tabs" aria-label="系统模块">
+      <button class="tab active" data-tab="performance"><span>01</span> AI运动表现</button>
+      <button class="tab" data-tab="posture"><span>02</span> AI体态筛查</button>
+      <button class="tab" data-tab="reaction"><span>03</span> 神经反应训练</button>
+    </nav>
+
+    <section id="performance" class="module active">
+      <div class="module-heading">
+        <div><p class="eyebrow">MOTION PERFORMANCE</p><h2>跳跃运动学评估</h2></div>
+        <p>识别人体骨架，记录起跳、腾空、峰值与落地阶段；输出位移、时间和关节角度估算。</p>
+      </div>
+      <div class="workspace">
+        <div class="stage-card">
+          <div class="video-shell">
+            <video id="pose-video" playsinline muted></video>
+            <canvas id="pose-canvas"></canvas>
+            <div id="camera-empty" class="empty-state">
+              <strong>等待视觉输入</strong>
+              <span>允许摄像头或选择本地视频后开始识别</span>
+            </div>
+          </div>
+          <div class="controls">
+            <button id="camera-button" class="primary">开启摄像头</button>
+            <label class="secondary file-button">选择视频<input id="video-file" type="file" accept="video/*"></label>
+            <button id="calibrate-button" class="secondary" disabled>静止标定 2 秒</button>
+            <button id="jump-button" class="accent" disabled>开始跳跃记录</button>
+          </div>
+          <p id="vision-status" class="hint">模型尚未加载。首次启动需联网下载开源模型。</p>
+        </div>
+        <aside class="metric-panel">
+          <label class="field">身高（用于像素比例估算）<input id="body-height" type="number" min="120" max="220" value="175"><span>cm</span></label>
+          <div class="metric-grid">
+            <article><span>跳跃高度估算</span><b id="jump-height">--</b><small>cm</small></article>
+            <article><span>腾空时间</span><b id="flight-time">--</b><small>ms</small></article>
+            <article><span>落地左膝角</span><b id="left-knee-angle">--</b><small>°</small></article>
+            <article><span>落地右膝角</span><b id="right-knee-angle">--</b><small>°</small></article>
+            <article><span>躯干侧倾</span><b id="trunk-lean">--</b><small>°</small></article>
+            <article><span>左右膝差</span><b id="knee-diff">--</b><small>°</small></article>
+          </div>
+          <div class="note"><strong>技术边界</strong><p>本模块输出单目视觉运动学估算，不能直接测量地面反作用力、功率或冲量。若接入真实测力台，可将动力学数据与这里的关节角同步融合。</p></div>
+        </aside>
+      </div>
+    </section>
+
+    <section id="posture" class="module">
+      <div class="module-heading">
+        <div><p class="eyebrow">POSTURE & MOVEMENT SCREEN</p><h2>体态与动作筛查</h2></div>
+        <p>复用同一视觉输入，通过关节几何关系发现左右差异与动作模式，给出训练观察提示。</p>
+      </div>
+      <div class="posture-layout">
+        <div class="posture-summary">
+          <div class="score-ring"><b id="posture-score">--</b><span>动作对称分</span></div>
+          <div><h3>当前观察</h3><p id="posture-summary-text">开启视觉识别并正对镜头站立，系统将实时计算。</p></div>
+        </div>
+        <div class="assessment-grid">
+          <article><span>肩线倾斜</span><b id="shoulder-tilt">--°</b><i id="shoulder-state">待识别</i></article>
+          <article><span>髋线倾斜</span><b id="hip-tilt">--°</b><i id="hip-state">待识别</i></article>
+          <article><span>躯干偏移</span><b id="posture-trunk">--°</b><i id="trunk-state">待识别</i></article>
+          <article><span>膝角差异</span><b id="posture-knee-diff">--°</b><i id="posture-knee-state">待识别</i></article>
+        </div>
+        <div class="screening-warning">仅用于运动训练前的观察与复测，不构成疾病、损伤或康复诊断。出现疼痛或明显功能障碍时，应由医生或持证康复专业人员评估。</div>
+      </div>
+    </section>
+
+    <section id="reaction" class="module">
+      <div class="module-heading">
+        <div><p class="eyebrow">NEURO REACTION TRAINING</p><h2>神经反应训练</h2></div>
+        <p>用可重复任务记录刺激发现、选择判断、动作启动、视觉记忆和手眼协调表现。</p>
+      </div>
+      <div class="reaction-toolbar">
+        <button class="mode active" data-mode="simple">简单反应</button>
+        <button class="mode" data-mode="grid">九宫格选择</button>
+        <button class="mode" data-mode="memory">顺序记忆</button>
+        <button id="reaction-start" class="primary">开始训练</button>
+      </div>
+      <div class="reaction-layout">
+        <div>
+          <div id="reaction-board" class="reaction-board" aria-live="polite">
+            <div id="reaction-message" class="reaction-message"><b>准备开始</b><span>选择模式，然后点击“开始训练”</span></div>
+            <div id="reaction-grid" class="reaction-grid"></div>
+          </div>
+          <div class="progress"><i id="reaction-progress"></i></div>
+        </div>
+        <aside class="reaction-report">
+          <p class="eyebrow">LIVE REPORT</p>
+          <div class="score-main"><b id="reaction-score">--</b><span>综合得分</span></div>
+          <dl>
+            <div><dt>平均反应</dt><dd id="mean-reaction">-- ms</dd></div>
+            <div><dt>最快反应</dt><dd id="best-reaction">-- ms</dd></div>
+            <div><dt>正确率</dt><dd id="reaction-accuracy">--%</dd></div>
+            <div><dt>有效次数</dt><dd id="reaction-count">0</dd></div>
+          </dl>
+          <button id="export-report" class="secondary">导出本次 JSON 报告</button>
+        </aside>
+      </div>
+    </section>
+
+    <section class="architecture">
+      <p class="eyebrow">TECHNICAL ARCHITECTURE</p>
+      <h2>开源算法是底座，业务产品是我们的工作。</h2>
+      <div class="flow">
+        <article><span>01</span><b>视频输入</b><small>摄像头 / 本地视频</small></article><i>→</i>
+        <article><span>02</span><b>开源关键点模型</b><small>MoveNet / TensorFlow.js</small></article><i>→</i>
+        <article><span>03</span><b>自主指标引擎</b><small>角度、时序、对称性</small></article><i>→</i>
+        <article><span>04</span><b>训练与报告</b><small>场景、评分、复测</small></article>
+      </div>
+    </section>
+  </main>
+
+  <footer><span>SPO 科技体能训练中心项目团队 · Open Demo</span><span>MIT License · 第三方许可见仓库说明</span></footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-core@4.22.0/dist/tf-core.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-converter@4.22.0/dist/tf-converter.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-webgl@4.22.0/dist/tf-backend-webgl.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection@2.1.3/dist/pose-detection.min.js"></script>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
